@@ -1,0 +1,21 @@
+# general 
+
+# front
+front/node_modules/
+front/dist/
+front/dist-ssr/
+
+front/package-lock.json
+
+front/.env
+front/.env.local
+
+front/npm-debug.log*
+front/yarn-debug.log*
+front/yarn-error.log*
+front/pnpm-debug.log*
+
+front/.vscode/
+front/.vite/
+
+# back
