@@ -1,10 +1,7 @@
 import './App.css'
 
-function App() {
-  
+export default function App() {
   return (
     <p>Hello World! </p>
   )
 }
-
-export default App
