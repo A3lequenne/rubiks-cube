@@ -5,7 +5,7 @@ export type Solve = {
   id: string;
   timeMS: number;
   scramble: string;
-  createdAt: Date;
+  createdAt: number;
   penalty: Penalty;
   source: SolveSource;
   notes?: string;
