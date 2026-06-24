@@ -8,8 +8,9 @@ export function useTimer(onStop?: (timeMs: number) => void) {
 
   const startTimeRef = useRef<number | null>(null);
   const intervalRef = useRef<number | null>(null);
-
-  //const armedRef = useRef(false);
+  const armedAtRef = useRef<number | null>(null);
+  const statusRef = useRef(status);
+  const armedHeldRef = useRef(false);
 
   // Arrow functions startTimer, stopTimer, (resetTimer)
   const startTimer = useCallback(() => {
@@ -18,7 +19,7 @@ export function useTimer(onStop?: (timeMs: number) => void) {
 
     intervalRef.current = window.setInterval(() => {
       setTime(Date.now() - (startTimeRef.current ?? Date.now()));
-    }, 10);
+    }, 30);
   }, []);
 
   const stopTimer = useCallback(() => {
@@ -37,20 +38,28 @@ export function useTimer(onStop?: (timeMs: number) => void) {
     onStop?.(finalTime);
   }, [onStop]);
 
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
+
   // Spacebar handler
   useEffect(() => {
     const handleSpaceDown = (e: KeyboardEvent) => {
       if (e.code !== "Space") 
         return (0);
 
+      if (armedHeldRef.current) 
+        return (0); 
+      armedHeldRef.current = true;
+
       e.preventDefault();
 
-      if (status === "idle") {
+      if (statusRef.current === "idle") {
         setStatus("armed");
-        return (0);
+        armedAtRef.current = Date.now();
       }
 
-      if (status === "running") {
+      if (statusRef.current === "running") {
         stopTimer();
       }
     };
@@ -59,10 +68,18 @@ export function useTimer(onStop?: (timeMs: number) => void) {
       if (e.code !== "Space")
         return (0);
 
+      armedHeldRef.current = false;
+
       e.preventDefault();
 
-      if (status === "armed") {
+      const elapsed = Date.now() - (armedAtRef.current ?? 0);
+
+      if (statusRef.current === "armed" && elapsed > 300) {
         startTimer();
+        armedAtRef.current = null;
+      } 
+      else if (statusRef.current === "armed") {
+        setStatus("idle");
       }
     };
 
@@ -73,7 +90,7 @@ export function useTimer(onStop?: (timeMs: number) => void) {
       window.removeEventListener("keydown", handleSpaceDown);
       window.removeEventListener("keyup", handleSpaceUp);
     };
-  }, [status, startTimer, stopTimer]);
+  }, [startTimer, stopTimer]);
 
   return {
     time,
