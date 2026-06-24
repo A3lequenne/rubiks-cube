@@ -1,4 +1,5 @@
 import { useTimer } from "../../hooks/useTimer";
+import { formatTime } from "../../utils/formatTime";
 
 export default function Timer() {
   const { time, status } = useTimer();
@@ -6,7 +7,7 @@ export default function Timer() {
   return (
     <div>
       <div>
-        { time }
+        { formatTime(time) }
       </div>
       <div>
         { status }
