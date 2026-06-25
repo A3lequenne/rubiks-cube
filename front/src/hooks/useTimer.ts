@@ -5,6 +5,7 @@ export function useTimer(onStop?: (timeMs: number) => void) {
   // States and ref
   const [status, setStatus] = useState<TimerStatus>("idle");
   const [time, setTime] = useState(0);
+  const [ready, setReady] = useState(false);
 
   const startTimeRef = useRef<number | null>(null);
   const intervalRef = useRef<number | null>(null);
@@ -56,6 +57,11 @@ export function useTimer(onStop?: (timeMs: number) => void) {
 
       if (statusRef.current === "idle") {
         setStatus("armed");
+        setReady(false);
+
+        window.setTimeout(() => {
+          setReady(true);
+        }, 300);
         armedAtRef.current = Date.now();
       }
 
@@ -81,6 +87,8 @@ export function useTimer(onStop?: (timeMs: number) => void) {
       else if (statusRef.current === "armed") {
         setStatus("idle");
       }
+
+      setReady(false);
     };
 
     window.addEventListener("keydown", handleSpaceDown);
@@ -95,5 +103,6 @@ export function useTimer(onStop?: (timeMs: number) => void) {
   return {
     time,
     status,
+    ready,
   };
 }
