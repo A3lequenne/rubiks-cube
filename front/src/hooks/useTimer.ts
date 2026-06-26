@@ -5,13 +5,13 @@ export function useTimer(onStop?: (timeMs: number) => void) {
   // States and ref
   const [status, setStatus] = useState<TimerStatus>("idle");
   const [time, setTime] = useState(0);
-  const [ready, setReady] = useState(false);
 
   const startTimeRef = useRef<number | null>(null);
   const intervalRef = useRef<number | null>(null);
   const armedAtRef = useRef<number | null>(null);
   const statusRef = useRef(status);
   const armedHeldRef = useRef(false);
+  const readyTimeoutRef = useRef<number | null>(null);
 
   // Arrow functions startTimer, stopTimer, (resetTimer)
   const startTimer = useCallback(() => {
@@ -57,12 +57,14 @@ export function useTimer(onStop?: (timeMs: number) => void) {
 
       if (statusRef.current === "idle") {
         setStatus("armed");
-        setReady(false);
-
-        window.setTimeout(() => {
-          setReady(true);
-        }, 300);
         armedAtRef.current = Date.now();
+        
+        readyTimeoutRef.current = window.setTimeout(() => {
+          if (armedHeldRef.current && statusRef.current === "armed") {
+            setStatus("ready");
+            setTime(0);
+          }
+        }, 300);
       }
 
       if (statusRef.current === "running") {
@@ -75,20 +77,20 @@ export function useTimer(onStop?: (timeMs: number) => void) {
         return (0);
 
       armedHeldRef.current = false;
+      if (readyTimeoutRef.current !== null) {
+        clearTimeout(readyTimeoutRef.current);
+        readyTimeoutRef.current = null;
+      }
 
       e.preventDefault();
 
-      const elapsed = Date.now() - (armedAtRef.current ?? 0);
-
-      if (statusRef.current === "armed" && elapsed > 300) {
+      if (statusRef.current === "ready") {
         startTimer();
         armedAtRef.current = null;
       } 
       else if (statusRef.current === "armed") {
         setStatus("idle");
       }
-
-      setReady(false);
     };
 
     window.addEventListener("keydown", handleSpaceDown);
@@ -97,12 +99,16 @@ export function useTimer(onStop?: (timeMs: number) => void) {
     return () => {
       window.removeEventListener("keydown", handleSpaceDown);
       window.removeEventListener("keyup", handleSpaceUp);
+
+      if (readyTimeoutRef.current !== null) {
+        clearTimeout(readyTimeoutRef.current);
+        readyTimeoutRef.current = null;
+      }
     };
   }, [startTimer, stopTimer]);
 
   return {
     time,
     status,
-    ready,
   };
 }
