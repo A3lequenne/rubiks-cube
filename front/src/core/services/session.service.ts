@@ -4,12 +4,15 @@
 
 // const session = sessions[0] ?? {
 //   id: "default",
-//   name: "Session0",
+//   name: "Session 1",
 //   createdAt: Date.now(),
+//   source: "timer",
 //   solves: [],
-//   cubeType: "3x3",
 // };
 
 // session.solves.push(NewSolve);
 
 // saveSessions([session]);
+
+import { getSessions, saveSession } from "./storage.service"
+

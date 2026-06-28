@@ -1,9 +1,10 @@
 import type { Solve } from "./Solve";
+import type { SolveSource } from "./SolveSource";
 
 export type Session = {
   id: string;
   name: string;
   createdAt: number;
-  cubeType: "2x2" | "3x3" | "4x4";
   solves: Solve[];
+  source: SolveSource;
 }

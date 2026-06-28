@@ -1,5 +1,4 @@
 import type { Penalty } from "./Penalty";
-import type { SolveSource } from "./SolveSource";
 
 export type Solve = {
   id: string;
@@ -7,6 +6,5 @@ export type Solve = {
   scramble: string;
   createdAt: number;
   penalty: Penalty;
-  source: SolveSource;
   notes?: string;
 }
